@@ -2,7 +2,7 @@
 
 usage: python3 tests/test_ornament.py [OPENSCAD]
 
-Each case renders src/ChristmasNameOrnament.scad to a binary STL with
+Each case renders src/ornament.scad to a binary STL with
 --hardwarnings, then counts its separate solids (triangles sharing a vertex
 belong to the same solid) and measures its bounding box, to within 0.01 mm.
 
@@ -19,8 +19,8 @@ import sys
 import tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SCAD = os.path.join(ROOT, "src", "ChristmasNameOrnament.scad")
-PRESETS = os.path.join(ROOT, "src", "ChristmasNameOrnament.json")
+SCAD = os.path.join(ROOT, "src", "ornament.scad")
+PRESETS = os.path.join(ROOT, "src", "ornament.json")
 FONT = "Liberation Sans"
 
 
