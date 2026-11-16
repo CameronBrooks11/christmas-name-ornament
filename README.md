@@ -11,7 +11,7 @@ one batch with [scadbatch](https://github.com/CameronBrooks11/scadbatch).
 
 ## Use it
 
-Open `src/ChristmasNameOrnament.scad` in [OpenSCAD](https://openscad.org) and
+Open `src/ornament.scad` in [OpenSCAD](https://openscad.org) and
 set the parameters in the Customizer panel:
 
 - **Name** and **font**, the font size, and whether there is a line under the
@@ -24,7 +24,7 @@ set the parameters in the Customizer panel:
   background, or everything.
 
 The Customizer also lists the five example presets in
-`src/ChristmasNameOrnament.json`, which OpenSCAD loads because it has the same
+`src/ornament.json`, which OpenSCAD loads because it has the same
 name as the `.scad` file.
 
 ### Long names
@@ -69,7 +69,7 @@ If there's no background, or no second line, exporting that part gives a
 in one run:
 
 ```sh
-scadbatch export src/ChristmasNameOrnament.scad src/ChristmasNameOrnament.json out/
+scadbatch export src/ornament.scad src/ornament.json out/
 ```
 
 Add your own names as presets in the JSON, or save them from the Customizer.
