@@ -59,8 +59,18 @@ text2_Y_offset = 0; // [-40:0.1:50]
 /* [Hidden] */
 $fn = 96;
 
-FONTS = ["", "Arial Black", "Arial:style=Bold Italic", "Berkshire Swash", "Courgette", "Sriracha",
-         "Yellowtail", "Tangerine", "Parisienne", "Italianno"];
+FONTS = [
+    "",
+    "Arial Black",
+    "Arial:style=Bold Italic",
+    "Berkshire Swash",
+    "Courgette",
+    "Sriracha",
+    "Yellowtail",
+    "Tangerine",
+    "Parisienne",
+    "Italianno",
+];
 function font(choice, other) = choice == 0 ? other : FONTS[choice];
 
 // The ball: a ring around a background disc, and a tab with a hole to hang it by.
@@ -68,7 +78,7 @@ BALL_R = 39.5;
 RING_W = 2;
 INNER_R = BALL_R - RING_W;
 TAB_W = 10;
-TAB_TOP = 45.5;   // 85 mm from the bottom of the ball
+TAB_TOP = 45.5; // 85 mm from the bottom of the ball
 HOLE_D = 3;
 UNDERLINE_W = 2;
 // The name's baseline, before name_Y_offset; the underline sits just below it.
@@ -83,38 +93,40 @@ underline = line_under_name == "yes" || !has_background;
 // ---------------- Shapes, in 2D ----------------
 
 module ring_2d() {
-  difference() {
-    union() {
-      circle(r = BALL_R);
-      // The tab: a stem up from the ball, rounded at the top.
-      hull() {
-        translate([-TAB_W / 2, INNER_R]) square([TAB_W, 1]);
-        translate([0, TAB_TOP - TAB_W / 2]) circle(d = TAB_W);
-      }
+    difference() {
+        union() {
+            circle(r=BALL_R);
+            // The tab: a stem up from the ball, rounded at the top.
+            hull() {
+                translate([-TAB_W / 2, INNER_R]) square([TAB_W, 1]);
+                translate([0, TAB_TOP - TAB_W / 2]) circle(d=TAB_W);
+            }
+        }
+        circle(r=INNER_R);
+        translate([0, TAB_TOP - TAB_W / 2]) circle(d=HOLE_D);
     }
-    circle(r = INNER_R);
-    translate([0, TAB_TOP - TAB_W / 2]) circle(d = HOLE_D);
-  }
 }
 
 module name_2d() {
-  f = font(font_name, other_font);
-  width = textmetrics(name, size = font_size, font = f, halign = "center").size.x;
-  s = (name_max_width > 0 && is_num(width) && width > name_max_width) ? name_max_width / width : 1;
-  translate([name_X_offset, NAME_BASE + name_Y_offset]) scale(s)
-    text(name, size = font_size, font = f, halign = "center", valign = "baseline");
-  if (underline)
+    f = font(font_name, other_font);
+    width = textmetrics(name, size=font_size, font=f, halign="center").size.x;
+    s = (name_max_width > 0 && is_num(width) && width > name_max_width) ? name_max_width / width : 1;
+    translate([name_X_offset, NAME_BASE + name_Y_offset]) scale(s)
+            text(name, size=font_size, font=f, halign="center", valign="baseline");
+    if (underline)
     // A chord of the ring under the name, its ends inside the ring so it joins it.
     intersection() {
-      circle(r = INNER_R + RING_W / 2);
-      translate([-BALL_R, NAME_BASE + name_Y_offset - UNDERLINE_W]) square([2 * BALL_R, UNDERLINE_W]);
+        circle(r=INNER_R + RING_W / 2);
+        translate([-BALL_R, NAME_BASE + name_Y_offset - UNDERLINE_W]) square([2 * BALL_R, UNDERLINE_W]);
     }
 }
 
 module text2_2d() {
-  translate([text2_X_offset, text2_Y_offset])
-    text(text2, size = text2_font_size, font = font(text2_font, text2_other_font),
-         halign = "center", valign = "center");
+    translate([text2_X_offset, text2_Y_offset])
+        text(
+            text2, size=text2_font_size, font=font(text2_font, text2_other_font),
+            halign="center", valign="center"
+        );
 }
 
 // A six-armed snowflake of radius r, one arm along +x. Each arm carries `branches`
@@ -122,26 +134,27 @@ module text2_2d() {
 // at its root and shorter toward the tip; `w` is the stroke width and `hub` the
 // radius of the solid centre.
 module flake_2d(r, branches, angle, reach, w, hub) {
-  module stroke(a, b) hull() { translate(a) circle(d = w, $fn = 16); translate(b) circle(d = w, $fn = 16); }
-  for (k = [0:5]) rotate(60 * k) {
-    stroke([0, 0], [r, 0]);
-    for (i = [1:branches]) {
-      x = r * i / (branches + 1);
-      len = r * reach * (1 - (i - 1) / (branches + 1));
-      for (s = [-1, 1]) stroke([x, 0], [x + len * cos(angle), s * len * sin(angle)]);
-    }
-  }
-  circle(r = hub, $fn = 6);
+    module stroke(a, b) hull() { translate(a) circle(d=w, $fn=16); translate(b) circle(d=w, $fn=16); }
+    for (k = [0:5])
+        rotate(60 * k) {
+            stroke([0, 0], [r, 0]);
+            for (i = [1:branches]) {
+                x = r * i / (branches + 1);
+                len = r * reach * (1 - (i - 1) / (branches + 1));
+                for (s = [-1, 1]) stroke([x, 0], [x + len * cos(angle), s * len * sin(angle)]);
+            }
+        }
+    circle(r=hub, $fn=6);
 }
 
 // The six designs: [radius, branches, angle, reach, stroke width, hub].
 FLAKES = [
-  [12, 2, 45, 0.45, 1.4, 2.5],   // 1: two broad branches
-  [12, 3, 60, 0.30, 1.2, 1.8],   // 2: three fine branches, wide angle
-  [13, 1, 35, 0.55, 1.8, 3.2],   // 3: one long branch, a heavy hub
-  [12, 4, 50, 0.22, 1.1, 2.0],   // 4: four short branches, fern-like
-  [11.5, 2, 70, 0.40, 1.6, 2.8], // 5: two branches almost square to the arm
-  [13, 3, 30, 0.38, 1.2, 1.4],   // 6: three swept-back branches, a small hub
+    [12, 2, 45, 0.45, 1.4, 2.5], // 1: two broad branches
+    [12, 3, 60, 0.30, 1.2, 1.8], // 2: three fine branches, wide angle
+    [13, 1, 35, 0.55, 1.8, 3.2], // 3: one long branch, a heavy hub
+    [12, 4, 50, 0.22, 1.1, 2.0], // 4: four short branches, fern-like
+    [11.5, 2, 70, 0.40, 1.6, 2.8], // 5: two branches almost square to the arm
+    [13, 3, 30, 0.38, 1.2, 1.4], // 6: three swept-back branches, a small hub
 ];
 
 // Where each position's flake sits, as an angle and a distance from the centre.
@@ -149,20 +162,23 @@ POSITIONS = [[130, 27], [50, 27], [230, 27], [310, 27]];
 FLAKE_CHOICES = [position_1_flake, position_2_flake, position_3_flake, position_4_flake];
 
 module flakes_2d() {
-  for (p = [0:3]) if (FLAKE_CHOICES[p] > 0) {
-    d = FLAKES[FLAKE_CHOICES[p] - 1];
-    a = POSITIONS[p][0];
-    // One arm points straight at the ring, which it reaches from every position, so a
-    // flake holds on with no background. Anything past the ring is trimmed away.
-    intersection() {
-      circle(r = INNER_R + RING_W / 2);
-      rotate(a) translate([POSITIONS[p][1], 0]) flake_2d(d[0], d[1], d[2], d[3], d[4], d[5]);
-    }
-  }
+    for (p = [0:3])
+        if (FLAKE_CHOICES[p] > 0) {
+            d = FLAKES[FLAKE_CHOICES[p] - 1];
+            a = POSITIONS[p][0];
+            // One arm points straight at the ring, which it reaches from every position, so a
+            // flake holds on with no background. Anything past the ring is trimmed away.
+            intersection() {
+                circle(r=INNER_R + RING_W / 2);
+                rotate(a) translate([POSITIONS[p][1], 0]) flake_2d(d[0], d[1], d[2], d[3], d[4], d[5]);
+            }
+        }
 }
 
-assert(len([for (p = POSITIONS) if (p[1] + min([for (f = FLAKES) f[0]]) <= INNER_R) 1]) == 0,
-       "a snowflake would not reach the ring");
+assert(
+    len([for (p = POSITIONS) if (p[1] + min([for (f = FLAKES) f[0]]) <= INNER_R) 1]) == 0,
+    "a snowflake would not reach the ring"
+);
 
 // ---------------- Parts, in 3D ----------------
 
@@ -178,20 +194,27 @@ module ball_part() color(COLOURS[0]) linear_extrude(z0 + details_thickness) ring
 module name_part() details(COLOURS[1]) name_2d();
 module text2_part() if (text2 != "") details(COLOURS[2]) text2_2d(); else placeholder();
 module flakes_part() details(COLOURS[3]) flakes_2d();
-module background_part()
-  if (has_background) color(COLOURS[4]) linear_extrude(background_thickness) circle(r = INNER_R + PLACEHOLDER);
-  else placeholder();
+module background_part() if (has_background)
+        color(COLOURS[4]) linear_extrude(background_thickness) circle(r=INNER_R + PLACEHOLDER);
+    else
+        placeholder();
 
-if (part == 1) ball_part();
-else if (part == 2) name_part();
-else if (part == 3) text2_part();
-else if (part == 4) flakes_part();
-else if (part == 5) background_part();
+if (part == 1)
+    ball_part();
+else if (part == 2)
+    name_part();
+else if (part == 3)
+    text2_part();
+else if (part == 4)
+    flakes_part();
+else if (part == 5)
+    background_part();
 else if (part == 6) {
-  ball_part();
-  name_part();
-  if (text2 != "") text2_part();
-  flakes_part();
-  if (has_background) background_part();
+    ball_part();
+    name_part();
+    if (text2 != "") text2_part();
+    flakes_part();
+    if (has_background) background_part();
 }
-else assert(false, str("part must be 1 to 6, not ", part));
+else
+    assert(false, str("part must be 1 to 6, not ", part));

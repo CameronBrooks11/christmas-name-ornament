@@ -130,10 +130,11 @@ def main():
         out = os.path.join(tmp, "case.stl")
         for label, params, preset, (want_solids, *want_size) in runs:
             result = render(openscad, out, params, preset)
-            if result.returncode != 0:
+            # A failed assert leaves the exit status at 0, so read stderr too.
+            errors = [l for l in result.stderr.splitlines()
+                      if "WARNING" in l or "ERROR" in l]
+            if result.returncode != 0 or errors:
                 failed += 1
-                errors = [l for l in result.stderr.splitlines()
-                          if "WARNING" in l or "ERROR" in l]
                 print(f"FAIL {label}: openscad exited {result.returncode}")
                 for line in errors:
                     print(f"     {line}")

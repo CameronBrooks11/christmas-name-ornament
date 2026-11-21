@@ -1,1 +1,3 @@
+title: christmas-name-ornament
+description: A flat Christmas ball ornament in OpenSCAD, with a name across it, snowflakes and parts for printing in several colours
 models: src/ornament.scad
